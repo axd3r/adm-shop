@@ -37,14 +37,13 @@ DB_PORT=5432
 DB_USERNAME=postgres
 ```
 
-
-## Project setup
+## Restore Database
 
 ```bash
 api/v1/seed
 ```
 
-## Restore Database
+## Project setup
 
 ```bash
 $ pnpm install
