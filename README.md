@@ -41,6 +41,12 @@ DB_USERNAME=postgres
 ## Project setup
 
 ```bash
+api/v1/seed
+```
+
+## Restore Database
+
+```bash
 $ pnpm install
 ```
 
