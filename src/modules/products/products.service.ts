@@ -7,6 +7,7 @@ import { DataSource, Repository } from 'typeorm';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { validate as isUUID } from 'uuid';
 import { ProductImage } from './entities/product-image.entity';
+import { handleDBExceptions } from 'src/common/helpers/handleExceptions.helper';
 
 @Injectable()
 export class ProductsService {
@@ -28,7 +29,7 @@ export class ProductsService {
       await this.productRepository.save(product)
       return { ...product, images };
     } catch (error) {
-      this.handleExceptions(error);
+      handleDBExceptions(error);
     }
   }
 
@@ -105,7 +106,7 @@ export class ProductsService {
     } catch (error) {
       await queryRunner.rollbackTransaction();
       await queryRunner.release()
-      this.handleExceptions(error);
+      handleDBExceptions(error);
     }
   }
 
@@ -121,13 +122,13 @@ export class ProductsService {
     }
   }
 
-  private handleExceptions(error: any) {
+  /* private handleExceptions(error: any): never {
     if (error.code === '23505') {
       throw new BadRequestException(error.detail);
     }
     this.logger.error(error)
     throw new InternalServerErrorException('Unexpected error, check server logs');
-  }
+  } */
 
   async deleteAllProducts() {
     try {
@@ -137,7 +138,7 @@ export class ProductsService {
         .from('products')
         .execute();
     } catch (error) {
-      this.handleExceptions(error);
+      handleDBExceptions(error);
     }
   }
 }

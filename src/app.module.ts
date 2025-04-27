@@ -9,6 +9,8 @@ import { SeedModule } from './seed/seed.module';
 import { FilesModule } from './storage/files/files.module';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -36,6 +38,10 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     SeedModule,
 
     FilesModule,
+
+    AuthModule,
+
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
