@@ -35,9 +35,38 @@ DB_NAME=database
 DB_HOST=host
 DB_PORT=5432
 DB_USERNAME=postgres
+
+HOST_API=http://localhost:3000/api/v1
+PORT=3000
+JWT_SECRET=secret_token
+```
+
+## First Steps
+Create a user with role admin, use this end point:
+```
+api/v1/users/register
+```
+example Body for postamn
+```bash
+{
+    "email": "user@gmail.com",
+    "password": "123Abc",
+    "fullName": "User Bot",
+    "role": ["admin"]
+}
 ```
 
 ## Restore Database
+This end point need authorization with Bearer Token
+- Log whit user and pasword
+
+```bash
+{
+    "email": "user@gmail.com",
+    "password": "123Abc"
+}
+```
+- Use the token obtained after validating with the Bearer Token authentication and call the following endpoint to restore the products table: 
 
 ```bash
 api/v1/seed
