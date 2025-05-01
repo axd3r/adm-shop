@@ -57,19 +57,19 @@ example Body for postamn
 ```
 
 ## Restore Database
-This end point need authorization with Bearer Token
-- Log whit user and pasword
+- Use the end point for restore the database
+
+```bash
+api/v1/seed
+```
+
+- Authenticate with username and password to obtain a token and modify data.
 
 ```bash
 {
     "email": "user@gmail.com",
     "password": "123Abc"
 }
-```
-- Use the token obtained after validating with the Bearer Token authentication and call the following endpoint to restore the products table: 
-
-```bash
-api/v1/seed
 ```
 
 ## Project setup

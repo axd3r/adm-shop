@@ -69,12 +69,16 @@ export class AuthController {
       user
     }
   }
-  /*
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
+  
+  @Get('check-auth-status')
+  @Auth()
+  checkAuthStatus(
+    @GetUser() user: User
+  ) {
+    return this.authService.checkAuthStatus(user);
   }
-
+  
+  /*
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.authService.remove(+id);
