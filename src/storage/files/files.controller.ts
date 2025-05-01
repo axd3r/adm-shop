@@ -6,7 +6,10 @@ import { diskStorage } from 'multer';
 import { fileNamer } from '../helpers/fileNamer.helper';
 import { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
+import { ApiConsumes, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ProductImage } from 'src/modules/products/entities/product-image.entity';
 
+@ApiTags('Files')
 @Controller('files')
 export class FilesController {
   constructor(
@@ -14,6 +17,10 @@ export class FilesController {
     private readonly filesService: FilesService) {}
 
   @Get('product/:imageName')
+  @ApiOperation({ summary: 'Return product image by name' })
+  @ApiParam({ name: 'imageName', description: 'Name of the image file' })
+  @ApiResponse({ status: 200, description: 'Image returned successfully', type: ProductImage})
+  @ApiResponse({ status: 404, description: 'Image not found' })
   findProductImage(
     @Res() res: Response,
     @Param('imageName') imageName: string
@@ -23,6 +30,10 @@ export class FilesController {
   }
 
   @Post('product')
+  @ApiOperation({ summary: 'Upload product image' })
+  @ApiConsumes('multipart/form-data')
+  @ApiResponse({ status: 201, description: 'Image uploaded successfully', type: ProductImage })
+  @ApiResponse({ status: 400, description: 'Invalid file or format' })
   @UseInterceptors( FileInterceptor('file0', {
     fileFilter: fileFilter,
     storage: diskStorage({
