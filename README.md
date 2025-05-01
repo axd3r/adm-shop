@@ -41,6 +41,12 @@ PORT=3000
 JWT_SECRET=secret_token
 ```
 
+## Documentation Swagger
+The documentation is available at:
+```bash
+http://localhost:3000/api
+```
+
 ## First Steps
 Create a user with role admin, use this end point:
 ```
