@@ -155,3 +155,17 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 ```bash 
 docker-compose up -d
 ```
+## Web Socket
+To use WebSocket, install the frontend example::
+```bash
+# Clone the repository
+git clone https://github.com/axd3r/exm-web-socket-client-adm-shop
+
+# Install dependencies
+pnpm install
+```
+
+For more information, visit this URL:
+```bash
+https://github.com/axd3r/exm-web-socket-client-adm-shop
+```
