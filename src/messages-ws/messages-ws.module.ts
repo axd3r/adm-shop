@@ -6,6 +6,6 @@ import { UsersModule } from 'src/modules/users/users.module';
 
 @Module({
   providers: [MessagesWsGateway, MessagesWsService],
-  imports: [AuthModule, UsersModule]
+  imports: [AuthModule, UsersModule],
 })
 export class MessagesWsModule {}

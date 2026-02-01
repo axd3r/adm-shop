@@ -1,0 +1,726 @@
+{
+  "info": {
+    "name": "ADM Shop - Complete E-Commerce API",
+    "description": "Colección completa para probar el flujo de e-commerce: Auth → Products → Cart → Orders → Payments",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/v1"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "productId",
+      "value": ""
+    },
+    {
+      "key": "cartItemId",
+      "value": ""
+    },
+    {
+      "key": "orderId",
+      "value": ""
+    },
+    {
+      "key": "paymentId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Auth",
+      "description": "Primero ejecuta el Seed para crear el usuario admin, luego usa Login Admin para obtener el token.",
+      "item": [
+        {
+          "name": "1.1 Login Usuario (Seed)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set('token', jsonData.token);",
+                  "    pm.collectionVariables.set('adminToken', jsonData.token);",
+                  "    console.log('Token y AdminToken guardados');",
+                  "}",
+                  "",
+                  "pm.test('Status code is 200 or 201', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "",
+                  "pm.test('Response has token', function () {",
+                  "    pm.expect(jsonData).to.have.property('token');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@gmail.com\",\n  \"password\": \"123Abc\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "1.2 Check Auth Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/check-auth-status"
+          }
+        },
+        {
+          "name": "1.3 Test Private Route",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/private"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Products",
+      "item": [
+        {
+          "name": "2.1 Listar Productos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.length > 0) {",
+                  "    pm.collectionVariables.set('productId', jsonData[0].id);",
+                  "    console.log('Product ID guardado:', jsonData[0].id);",
+                  "}",
+                  "",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function () {",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products?limit=10&offset=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"],
+              "query": [
+                {"key": "limit", "value": "10"},
+                {"key": "offset", "value": "0"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "2.2 Crear Producto (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.id) {",
+                  "    pm.collectionVariables.set('productId', jsonData.id);",
+                  "    console.log('Product ID guardado:', jsonData.id);",
+                  "}",
+                  "",
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Camiseta Test\",\n  \"price\": 75.00,\n  \"description\": \"Camiseta de prueba para testing\",\n  \"slug\": \"camiseta-test\",\n  \"stock\": 100,\n  \"sizes\": [\"S\", \"M\", \"L\", \"XL\"],\n  \"gender\": \"unisex\",\n  \"tags\": [\"test\", \"camiseta\"],\n  \"images\": [\"https://example.com/img1.jpg\"]\n}"
+            },
+            "url": "{{baseUrl}}/products"
+          }
+        },
+        {
+          "name": "2.3 Obtener Producto por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/products/{{productId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Cart",
+      "item": [
+        {
+          "name": "3.1 Ver Mi Carrito",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/cart"
+          }
+        },
+        {
+          "name": "3.2 Agregar al Carrito",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.items && jsonData.items.length > 0) {",
+                  "    pm.collectionVariables.set('cartItemId', jsonData.items[0].id);",
+                  "    console.log('Cart Item ID guardado:', jsonData.items[0].id);",
+                  "}",
+                  "",
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"{{productId}}\",\n  \"quantity\": 2,\n  \"size\": \"M\"\n}"
+            },
+            "url": "{{baseUrl}}/cart/items"
+          }
+        },
+        {
+          "name": "3.3 Actualizar Item del Carrito",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 3\n}"
+            },
+            "url": "{{baseUrl}}/cart/items/{{cartItemId}}"
+          }
+        },
+        {
+          "name": "3.4 Resumen para Checkout",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/cart/checkout"
+          }
+        },
+        {
+          "name": "3.5 Vaciar Carrito",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/cart"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Orders",
+      "item": [
+        {
+          "name": "4.1 Crear Orden",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.id) {",
+                  "    pm.collectionVariables.set('orderId', jsonData.id);",
+                  "    console.log('Order ID guardado:', jsonData.id);",
+                  "}",
+                  "",
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Order has pending status', function () {",
+                  "    pm.expect(jsonData.status).to.equal('pending');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{productId}}\",\n      \"quantity\": 2,\n      \"price\": 75.00,\n      \"size\": \"M\"\n    }\n  ],\n  \"shippingAddress\": \"Av. Javier Prado 123, San Isidro, Lima\",\n  \"notes\": \"Dejar en recepción\"\n}"
+            },
+            "url": "{{baseUrl}}/orders"
+          }
+        },
+        {
+          "name": "4.2 Listar Mis Órdenes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/orders"
+          }
+        },
+        {
+          "name": "4.3 Obtener Orden por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/orders/{{orderId}}"
+          }
+        },
+        {
+          "name": "4.4 Listar Todas las Órdenes (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/orders/admin/all"
+          }
+        },
+        {
+          "name": "4.5 Cancelar Orden",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/orders/{{orderId}}/cancel"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Payments",
+      "item": [
+        {
+          "name": "5.1 Pagar con Culqi",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.id) {",
+                  "    pm.collectionVariables.set('paymentId', jsonData.id);",
+                  "    console.log('Payment ID guardado:', jsonData.id);",
+                  "}",
+                  "",
+                  "pm.test('Payment was processed', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"provider\": \"culqi\",\n  \"token\": \"tkn_test_xxxxxxxx\",\n  \"method\": \"credit_card\",\n  \"email\": \"cliente@example.com\",\n  \"description\": \"Compra en ADM Shop\"\n}"
+            },
+            "url": "{{baseUrl}}/payments"
+          }
+        },
+        {
+          "name": "5.2 Pagar con MercadoPago",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.id) {",
+                  "    pm.collectionVariables.set('paymentId', jsonData.id);",
+                  "}",
+                  "",
+                  "pm.test('Payment was processed', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"provider\": \"mercadopago\",\n  \"token\": \"TEST-xxxx-xxxx-xxxx\",\n  \"method\": \"credit_card\",\n  \"email\": \"cliente@example.com\",\n  \"description\": \"Compra en ADM Shop\",\n  \"installments\": 1,\n  \"paymentMethodId\": \"visa\",\n  \"identification\": {\n    \"type\": \"DNI\",\n    \"number\": \"12345678\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/payments"
+          }
+        },
+        {
+          "name": "5.3 Pagar con Stripe",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.id) {",
+                  "    pm.collectionVariables.set('paymentId', jsonData.id);",
+                  "}",
+                  "",
+                  "pm.test('Payment was processed', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"provider\": \"stripe\",\n  \"token\": \"pm_card_visa\",\n  \"method\": \"credit_card\",\n  \"email\": \"cliente@example.com\",\n  \"description\": \"Compra en ADM Shop\",\n  \"returnUrl\": \"https://tudominio.com/payment/complete\"\n}"
+            },
+            "url": "{{baseUrl}}/payments"
+          }
+        },
+        {
+          "name": "5.4 Listar Mis Pagos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/payments"
+          }
+        },
+        {
+          "name": "5.5 Listar Todos los Pagos (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/payments/admin/all"
+          }
+        },
+        {
+          "name": "5.6 Obtener Pago por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/payments/{{paymentId}}"
+          }
+        },
+        {
+          "name": "5.7 Pagos por Orden",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/payments/order/{{orderId}}"
+          }
+        },
+        {
+          "name": "5.8 Reembolsar Pago (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 50.00,\n  \"reason\": \"Solicitud del cliente\"\n}"
+            },
+            "url": "{{baseUrl}}/payments/{{paymentId}}/refund"
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Webhooks (Simulación)",
+      "description": "Estos endpoints simulan las notificaciones de los proveedores de pago. En producción, son llamados por Culqi, MercadoPago o Stripe.",
+      "item": [
+        {
+          "name": "6.1 Webhook Culqi - Pago Exitoso",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-culqi-signature",
+                "value": "test_signature"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"object\": \"event\",\n  \"type\": \"charge.creation.succeeded\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"chr_test_123\",\n      \"amount\": 15000,\n      \"currency_code\": \"PEN\",\n      \"email\": \"test@example.com\",\n      \"source\": {\n        \"card_number\": \"************4242\",\n        \"card_brand\": \"VISA\"\n      },\n      \"outcome\": {\n        \"type\": \"venta_exitosa\",\n        \"code\": \"AUT0000\",\n        \"merchant_message\": \"La operación fue autorizada exitosamente.\",\n        \"user_message\": \"Su compra ha sido exitosa.\"\n      }\n    }\n  },\n  \"created\": 1705320000\n}"
+            },
+            "url": "{{baseUrl}}/payments/webhooks/culqi"
+          }
+        },
+        {
+          "name": "6.2 Webhook Culqi - Pago Fallido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-culqi-signature",
+                "value": "test_signature"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"object\": \"event\",\n  \"type\": \"charge.creation.failed\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"chr_test_456\",\n      \"amount\": 15000,\n      \"currency_code\": \"PEN\",\n      \"email\": \"test@example.com\",\n      \"outcome\": {\n        \"type\": \"venta_rechazada\",\n        \"code\": \"card_declined\",\n        \"merchant_message\": \"La tarjeta fue declinada.\",\n        \"user_message\": \"Su tarjeta fue declinada.\"\n      }\n    }\n  },\n  \"created\": 1705320000\n}"
+            },
+            "url": "{{baseUrl}}/payments/webhooks/culqi"
+          }
+        },
+        {
+          "name": "6.3 Webhook MercadoPago - Pago Aprobado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-signature",
+                "value": "ts=123456,v1=test_signature"
+              },
+              {
+                "key": "x-request-id",
+                "value": "req_123"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 12345,\n  \"live_mode\": false,\n  \"type\": \"payment\",\n  \"date_created\": \"2026-01-16T10:00:00Z\",\n  \"user_id\": \"123456\",\n  \"api_version\": \"v1\",\n  \"action\": \"payment.updated\",\n  \"data\": {\n    \"id\": \"98765\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/payments/webhooks/mercadopago"
+          }
+        },
+        {
+          "name": "6.4 Webhook Stripe - PaymentIntent Exitoso",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "stripe-signature",
+                "value": "t=1705320000,v1=test_signature"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"evt_test_123\",\n  \"object\": \"event\",\n  \"api_version\": \"2023-10-16\",\n  \"created\": 1705320000,\n  \"type\": \"payment_intent.succeeded\",\n  \"livemode\": false,\n  \"data\": {\n    \"object\": {\n      \"id\": \"pi_test_123\",\n      \"object\": \"payment_intent\",\n      \"amount\": 15000,\n      \"amount_received\": 15000,\n      \"currency\": \"pen\",\n      \"status\": \"succeeded\",\n      \"metadata\": {}\n    }\n  }\n}"
+            },
+            "url": "{{baseUrl}}/payments/webhooks/stripe"
+          }
+        },
+        {
+          "name": "6.5 Webhook Stripe - Reembolso",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "stripe-signature",
+                "value": "t=1705320000,v1=test_signature"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"evt_test_refund\",\n  \"object\": \"event\",\n  \"api_version\": \"2023-10-16\",\n  \"created\": 1705320000,\n  \"type\": \"charge.refunded\",\n  \"livemode\": false,\n  \"data\": {\n    \"object\": {\n      \"id\": \"ch_test_123\",\n      \"object\": \"charge\",\n      \"amount\": 15000,\n      \"amount_refunded\": 5000,\n      \"currency\": \"pen\",\n      \"payment_intent\": \"pi_test_123\",\n      \"status\": \"succeeded\",\n      \"refunded\": true\n    }\n  }\n}"
+            },
+            "url": "{{baseUrl}}/payments/webhooks/stripe"
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Seed (Desarrollo)",
+      "item": [
+        {
+          "name": "7.1 Ejecutar Seed",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/seed"
+          }
+        }
+      ]
+    }
+  ]
+}

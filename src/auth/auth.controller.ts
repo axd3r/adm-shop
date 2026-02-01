@@ -1,4 +1,11 @@
-import { Controller, Get, Post, Body, UseGuards, Req, SetMetadata } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginUserDTO } from './dto/login-user.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -35,66 +42,70 @@ export class AuthController {
     @Req() request: Request,
     @GetUser() user: User,
     @GetUser('email') userEmail: string,
-    @GetHeaders('authorization') header: string[]
+    @GetHeaders('authorization') header: string[],
   ) {
-      
     return {
       ok: true,
       user,
       userEmail,
-      header
-    }
+      header,
+    };
   }
 
   //verificar role
   @Get('private2')
-  @ApiOperation({ summary: 'Private route with role check (admin or superUser)' })
-  @ApiResponse({ status: 200, description: 'Authorized access for admin or superUser' })
+  @ApiOperation({
+    summary: 'Private route with role check (admin or superUser)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Authorized access for admin or superUser',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden, role not allowed' })
   //@SetMetadata('roles', ['admin', 'super-user'])
-  @RoleProtected( ValidRoles.superUser, ValidRoles.admin)
+  @RoleProtected(ValidRoles.superUser, ValidRoles.admin)
   @UseGuards(AuthGuard(), UserRoleGuard)
   anotherFindUserInfo(
     @Req() request: Request,
     @GetUser() user: User,
     @GetUser('email') userEmail: string,
-    @GetHeaders('authorization') header: string[]
+    @GetHeaders('authorization') header: string[],
   ) {
-      
     return {
       ok: true,
       user,
       userEmail,
-      header
-    }
+      header,
+    };
   }
 
   //verificar role forma de nestjs
   @Get('private3')
-  @ApiOperation({ summary: 'Private route using custom Auth decorator (admin only)' })
+  @ApiOperation({
+    summary: 'Private route using custom Auth decorator (admin only)',
+  })
   @ApiResponse({ status: 200, description: 'Authorized admin access' })
   @ApiResponse({ status: 403, description: 'Forbidden, role not allowed' })
   @Auth(ValidRoles.admin)
-  anotherFindUserInf(
-    @GetUser() user: User,
-  ) {
+  anotherFindUserInf(@GetUser() user: User) {
     return {
       ok: true,
-      user
-    }
+      user,
+    };
   }
-  
+
   @Get('check-auth-status')
   @ApiOperation({ summary: 'Check auth status for logged-in user' })
-  @ApiResponse({ status: 200, description: 'Returns user and new JWT token if valid' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns user and new JWT token if valid',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @Auth()
-  checkAuthStatus(
-    @GetUser() user: User
-  ) {
+  checkAuthStatus(@GetUser() user: User) {
     return this.authService.checkAuthStatus(user);
   }
-  
+
   /*
   @Delete(':id')
   remove(@Param('id') id: string) {

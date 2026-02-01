@@ -12,8 +12,14 @@ async function bootstrap() {
     new ValidationPipe({
       whitelist: true,
       forbidUnknownValues: true,
-    })
-  )
+    }),
+  );
+
+  app.enableCors({
+    origin: process.env.FRONT_URL,
+    methods: process.env.FRONT_METHODS,
+    credentials: true,
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Adm RESTfull API')
@@ -25,4 +31,4 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+void bootstrap();

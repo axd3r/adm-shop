@@ -1,0 +1,56 @@
+# Dependencies
+node_modules
+npm-debug.log
+
+# Build output
+dist
+
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Test files
+coverage
+*.spec.ts
+__tests__
+
+# Documentation
+*.md
+!README.md
+
+# Docker
+Dockerfile*
+docker-compose*
+.docker
+
+# Database volumes
+postgres
+
+# Environment files (should be passed at runtime)
+.env
+.env.*
+!.env.example
+
+# Static files that should be served separately
+static/products
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Postman collection
+postman
+
+# Temporary files
+tmp
+temp

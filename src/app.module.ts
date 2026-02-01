@@ -12,6 +12,10 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { MessagesWsModule } from './messages-ws/messages-ws.module';
+import { OrdersModule } from './modules/orders/orders.module';
+import { CartModule } from './modules/cart/cart.module';
+import { PaymentsModule } from './modules/payments/payments.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -25,11 +29,11 @@ import { MessagesWsModule } from './messages-ws/messages-ws.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       autoLoadEntities: true,
-      synchronize: true
+      synchronize: true,
     }),
 
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname,'..','public'),
+      rootPath: join(__dirname, '..', 'public'),
     }),
 
     ProductsModule,
@@ -45,6 +49,14 @@ import { MessagesWsModule } from './messages-ws/messages-ws.module';
     UsersModule,
 
     MessagesWsModule,
+
+    OrdersModule,
+
+    CartModule,
+
+    PaymentsModule,
+
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

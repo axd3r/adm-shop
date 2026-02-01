@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseUUIDPipe,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -9,6 +20,7 @@ import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { User } from '../users/entities/user.entity';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Product } from './entities/product.entity';
+import { SellerOwnershipGuard } from 'src/auth/guards/seller-ownership/seller-ownership.guard';
 
 @ApiTags('Products')
 @Controller('products')
@@ -16,25 +28,44 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @ApiOperation({ summary: 'Create a new product' })
-  @ApiResponse({ status: 201, description: 'Product was created', type: Product })
+  @ApiResponse({
+    status: 201,
+    description: 'Product was created',
+    type: Product,
+  })
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 403, description: 'Forbidden, Token related' })
   @Post()
-  @Auth(ValidRoles.admin)
-  create(
-    @Body() createProductDto: CreateProductDto,
-    @GetUser() user: User
-  ) {
+  @Auth(ValidRoles.admin, ValidRoles.seller)
+  create(@Body() createProductDto: CreateProductDto, @GetUser() user: User) {
     return this.productsService.create(createProductDto, user);
   }
 
   @ApiOperation({ summary: 'Get all products with pagination' })
-  @ApiResponse({ status: 200, description: 'List of products returned', type: [Product] })
+  @ApiResponse({
+    status: 200,
+    description: 'List of products returned',
+    type: [Product],
+  })
   @ApiResponse({ status: 403, description: 'Forbidden, Token related' })
   @Get()
-  @Auth()
+  //@Auth()
   findAll(@Query() paginationDto: PaginationDto) {
     return this.productsService.findAll(paginationDto);
+  }
+
+  @ApiOperation({ summary: 'Get all products owned by the seller' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of seller products returned',
+    type: [Product],
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Seller only' })
+  @Get('seller/my-products')
+  @Auth(ValidRoles.seller, ValidRoles.admin)
+  findMySeller(@Query() paginationDto: PaginationDto, @GetUser() user: User) {
+    return this.productsService.findBySeller(paginationDto, user);
   }
 
   @ApiOperation({ summary: 'Find one product by ID, UUID or slug' })
@@ -50,11 +81,12 @@ export class ProductsController {
   @ApiResponse({ status: 404, description: 'Product not found' })
   @ApiResponse({ status: 403, description: 'Forbidden, Token related' })
   @Patch(':id')
-  @Auth(ValidRoles.admin)
+  @Auth(ValidRoles.admin, ValidRoles.seller)
+  @UseGuards(SellerOwnershipGuard)
   update(
-    @Param('id', ParseUUIDPipe) id: string, 
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateProductDto: UpdateProductDto,
-    @GetUser() user: User
+    @GetUser() user: User,
   ) {
     return this.productsService.update(id, updateProductDto, user);
   }
@@ -64,8 +96,9 @@ export class ProductsController {
   @ApiResponse({ status: 404, description: 'Product not found' })
   @ApiResponse({ status: 403, description: 'Forbidden, Token related' })
   @Delete(':id')
-  @Auth(ValidRoles.admin)
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.productsService.remove(id);
+  @Auth(ValidRoles.admin, ValidRoles.seller)
+  @UseGuards(SellerOwnershipGuard)
+  remove(@Param('id', ParseUUIDPipe) id: string, @GetUser() user: User) {
+    return this.productsService.remove(id, user);
   }
 }

@@ -5,14 +5,10 @@ import { AuthGuard } from '@nestjs/passport';
 import { UserRoleGuard } from 'src/auth/guards/user-role/user-role.guard';
 
 export function Auth(...roles: ValidRoles[]) {
-  
-  const decorators = [ UseGuards(AuthGuard()) ];
+  const decorators = [UseGuards(AuthGuard())];
 
   if (roles.length > 0) {
-    decorators.push(
-      RoleProtected(...roles),
-      UseGuards(UserRoleGuard)
-    );
+    decorators.push(RoleProtected(...roles), UseGuards(UserRoleGuard));
   }
 
   return applyDecorators(...decorators);

@@ -1,12 +1,18 @@
-import { createParamDecorator, ExecutionContext, InternalServerErrorException } from "@nestjs/common"
+import {
+  createParamDecorator,
+  ExecutionContext,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { Request } from 'express';
 
 export const GetHeaders = createParamDecorator(
-    (data, ctx: ExecutionContext) => {
-        const req = ctx.switchToHttp().getRequest();
-        const header = req.headers
+  (data: string | undefined, ctx: ExecutionContext): unknown => {
+    const req = ctx.switchToHttp().getRequest<Request>();
+    const headers = req.headers;
 
-        if(!header) throw new InternalServerErrorException('header is not found (request');
-        
-        return (!data) ? header : header[data];
-    }
-)
+    if (!headers)
+      throw new InternalServerErrorException('header is not found (request');
+
+    return !data ? headers : headers[data];
+  },
+);

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm';
@@ -13,18 +13,18 @@ export class UsersService {
   //private readonly logger = new Logger('UsersService');
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>
-  ){}
+    private readonly userRepository: Repository<User>,
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
     try {
-      const {password, ...userData} = createUserDto;
+      const { password, ...userData } = createUserDto;
       const user = this.userRepository.create({
         ...userData,
-        password: bcrypt.hashSync(password, 10)
+        password: bcrypt.hashSync(password, 10),
       });
       await this.userRepository.save(user);
-      
+
       return instanceToPlain(user);
     } catch (error) {
       handleDBExceptions(error);

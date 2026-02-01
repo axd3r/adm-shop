@@ -1,0 +1,267 @@
+{
+  "info": {
+    "name": "ADM Shop - Payments",
+    "description": "Colección de endpoints para el módulo de pagos multi-gateway",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/v1"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set('token', jsonData.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Admin123\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Crear Pago - Culqi",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"provider\": \"culqi\",\n  \"token\": \"tkn_test_xxxxxxxx\",\n  \"method\": \"credit_card\",\n  \"email\": \"cliente@example.com\",\n  \"description\": \"Compra en ADM Shop\"\n}"
+            },
+            "url": "{{baseUrl}}/payments"
+          }
+        },
+        {
+          "name": "Crear Pago - MercadoPago",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"provider\": \"mercadopago\",\n  \"token\": \"TEST-xxxx-xxxx-xxxx\",\n  \"method\": \"credit_card\",\n  \"email\": \"cliente@example.com\",\n  \"description\": \"Compra en ADM Shop\",\n  \"installments\": 1,\n  \"paymentMethodId\": \"visa\",\n  \"identification\": {\n    \"type\": \"DNI\",\n    \"number\": \"12345678\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/payments"
+          }
+        },
+        {
+          "name": "Crear Pago - Stripe",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"provider\": \"stripe\",\n  \"token\": \"pm_card_visa\",\n  \"method\": \"credit_card\",\n  \"email\": \"cliente@example.com\",\n  \"description\": \"Compra en ADM Shop\",\n  \"returnUrl\": \"https://tudominio.com/payment/complete\"\n}"
+            },
+            "url": "{{baseUrl}}/payments"
+          }
+        },
+        {
+          "name": "Listar Mis Pagos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/payments"
+          }
+        },
+        {
+          "name": "Listar Todos (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/payments/admin/all"
+          }
+        },
+        {
+          "name": "Obtener Pago por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/payments/{{paymentId}}"
+          }
+        },
+        {
+          "name": "Pagos por Orden",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/payments/order/{{orderId}}"
+          }
+        },
+        {
+          "name": "Reembolsar Pago (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 50.00,\n  \"reason\": \"Solicitud del cliente\"\n}"
+            },
+            "url": "{{baseUrl}}/payments/{{paymentId}}/refund"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Webhooks (Test)",
+      "item": [
+        {
+          "name": "Webhook Culqi",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-culqi-signature",
+                "value": "test_signature"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"object\": \"event\",\n  \"type\": \"charge.creation.succeeded\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"chr_test_123\",\n      \"amount\": 10000,\n      \"currency_code\": \"PEN\",\n      \"email\": \"test@example.com\",\n      \"outcome\": {\n        \"type\": \"venta_exitosa\",\n        \"code\": \"AUT0000\"\n      }\n    }\n  },\n  \"created\": 1705320000\n}"
+            },
+            "url": "{{baseUrl}}/payments/webhooks/culqi"
+          }
+        },
+        {
+          "name": "Webhook MercadoPago",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-signature",
+                "value": "ts=123456,v1=test_signature"
+              },
+              {
+                "key": "x-request-id",
+                "value": "req_123"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 12345,\n  \"live_mode\": false,\n  \"type\": \"payment\",\n  \"date_created\": \"2026-01-15T10:00:00Z\",\n  \"user_id\": \"123456\",\n  \"api_version\": \"v1\",\n  \"action\": \"payment.updated\",\n  \"data\": {\n    \"id\": \"98765\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/payments/webhooks/mercadopago"
+          }
+        },
+        {
+          "name": "Webhook Stripe",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "stripe-signature",
+                "value": "t=1705320000,v1=test_signature"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"evt_test_123\",\n  \"object\": \"event\",\n  \"api_version\": \"2023-10-16\",\n  \"created\": 1705320000,\n  \"type\": \"payment_intent.succeeded\",\n  \"livemode\": false,\n  \"data\": {\n    \"object\": {\n      \"id\": \"pi_test_123\",\n      \"object\": \"payment_intent\",\n      \"amount\": 10000,\n      \"currency\": \"pen\",\n      \"status\": \"succeeded\"\n    }\n  }\n}"
+            },
+            "url": "{{baseUrl}}/payments/webhooks/stripe"
+          }
+        }
+      ]
+    }
+  ]
+}

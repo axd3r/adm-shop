@@ -7,12 +7,11 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class SeedService {
-
   constructor(
     private readonly productsService: ProductsService,
 
-    @InjectRepository( User )
-    private readonly userRepository: Repository<User>
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async executeSeed() {
@@ -27,10 +26,7 @@ export class SeedService {
     await this.productsService.deleteAllProducts();
 
     const queryBuilder = this.userRepository.createQueryBuilder();
-    await queryBuilder
-      .delete()
-      .where({})
-      .execute();
+    await queryBuilder.delete().where({}).execute();
   }
 
   private async insertUsers() {
@@ -38,26 +34,26 @@ export class SeedService {
 
     const users: User[] = [];
 
-    seedUsers.forEach( user => {
-      users.push( this.userRepository.create( user ) )
+    seedUsers.forEach((user) => {
+      users.push(this.userRepository.create(user));
     });
 
-    const dbUsers =  await this.userRepository.save( seedUsers );
+    const dbUsers = await this.userRepository.save(seedUsers);
 
-    return dbUsers[0]
+    return dbUsers[0];
   }
 
   private async insertNewProducts(user: User) {
     await this.productsService.deleteAllProducts();
-    const products =  initialData.products;
+    const products = initialData.products;
 
     const insertPromsies: Promise<any>[] = [];
-    products.forEach( product => {
-      insertPromsies.push(this.productsService.create(product, user))
-    })
+    products.forEach((product) => {
+      insertPromsies.push(this.productsService.create(product, user));
+    });
 
-    await Promise.all(insertPromsies)
-    
+    await Promise.all(insertPromsies);
+
     return true;
   }
 }

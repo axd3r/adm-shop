@@ -36,6 +36,7 @@
     "bcryptjs": "^3.0.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
+    "nodemailer": "^7.0.12",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
@@ -59,6 +60,7 @@
     "@types/jest": "^29.5.14",
     "@types/multer": "^1.4.12",
     "@types/node": "^22.10.7",
+    "@types/nodemailer": "^7.0.5",
     "@types/passport-jwt": "^4.0.1",
     "@types/supertest": "^6.0.2",
     "eslint": "^9.18.0",
@@ -91,6 +93,9 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/$1"
+    }
   }
 }

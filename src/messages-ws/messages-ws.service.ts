@@ -5,58 +5,55 @@ import { User } from 'src/modules/users/entities/user.entity';
 import { Repository } from 'typeorm';
 
 interface ConectedClients {
-    [id: string]: {
-        socket: Socket,
-        user: User,
-
-    }
+  [id: string]: {
+    socket: Socket;
+    user: User;
+  };
 }
 
 @Injectable()
 export class MessagesWsService {
+  private connectedClients: ConectedClients = {};
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
 
-    private connectedClients: ConectedClients = {}
-    constructor(
-        @InjectRepository(User)
-        private readonly userRepository: Repository<User>
-    ) { }
+  async registerClient(client: Socket, userId: string) {
+    const user = await this.userRepository.findOneBy({ id: userId });
 
-    async registerClient(client: Socket, userId: string) {
+    if (!user) throw new Error(`User not found`);
+    if (!user.isActive) throw new Error(`User not active`);
 
-        const user = await this.userRepository.findOneBy({ id: userId });
+    this.checkUserConnection(user);
 
-        if (!user) throw new Error(`User not found`);
-        if (!user.isActive) throw new Error(`User not active`);
+    this.connectedClients[client.id] = {
+      socket: client,
+      user: user,
+    };
+  }
 
-        this.checkUserConnection(user);
+  removeClient(clientId: string) {
+    delete this.connectedClients[clientId];
+  }
 
-        this.connectedClients[client.id] = {
-            socket: client,
-            user: user
-        };
+  getConnectedClients(): string[] {
+    //console.log(this.connectedClients);
+    return Object.keys(this.connectedClients);
+  }
+
+  getUserFullName(socketId: string) {
+    return this.connectedClients[socketId].user.fullName;
+  }
+
+  private checkUserConnection(user: User) {
+    for (const clientId of Object.keys(this.connectedClients)) {
+      const connectedClients = this.connectedClients[clientId];
+
+      if (connectedClients.user.id === user.id) {
+        connectedClients.socket.disconnect();
+        break;
+      }
     }
-
-    removeClient(clientId: string) {
-        delete this.connectedClients[clientId];
-    }
-
-    getConnectedClients(): string[] {
-        //console.log(this.connectedClients);
-        return Object.keys(this.connectedClients);
-    }
-
-    getUserFullName(socketId: string) {
-        return this.connectedClients[socketId].user.fullName;
-    }
-
-    private checkUserConnection(user: User) {
-        for (const clientId of Object.keys(this.connectedClients)) {
-            const connectedClients = this.connectedClients[clientId];
-
-            if (connectedClients.user.id === user.id) {
-                connectedClients.socket.disconnect();
-                break;
-            }
-        }
-    }
+  }
 }
