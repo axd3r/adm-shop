@@ -8,10 +8,7 @@ import { Product } from '../products/entities/product.entity';
 import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Cart, CartItem, Product]),
-    AuthModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Cart, CartItem, Product]), AuthModule],
   controllers: [CartController],
   providers: [CartService],
   exports: [CartService],

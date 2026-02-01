@@ -8,10 +8,7 @@ import { Product } from '../products/entities/product.entity';
 import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Order, OrderItem, Product]),
-    AuthModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Order, OrderItem, Product]), AuthModule],
   controllers: [OrdersController],
   providers: [OrdersService],
   exports: [OrdersService],

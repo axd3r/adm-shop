@@ -84,7 +84,9 @@ describe('UsersController', () => {
       const result = controller.update('1', { fullName: 'Updated Name' });
 
       expect(result).toBe('This action updates a #1 user');
-      expect(service.update).toHaveBeenCalledWith(1, { fullName: 'Updated Name' });
+      expect(service.update).toHaveBeenCalledWith(1, {
+        fullName: 'Updated Name',
+      });
     });
   });
 

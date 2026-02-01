@@ -10,11 +10,15 @@ interface RequestWithUser {
 }
 
 export const GetUser = createParamDecorator(
-  (data: keyof User | undefined, ctx: ExecutionContext): User | User[keyof User] => {
+  (
+    data: keyof User | undefined,
+    ctx: ExecutionContext,
+  ): User | User[keyof User] => {
     const req = ctx.switchToHttp().getRequest<RequestWithUser>();
     const user = req.user;
 
-    if (!user) throw new InternalServerErrorException('User not found (request');
+    if (!user)
+      throw new InternalServerErrorException('User not found (request');
 
     return !data ? user : user[data];
   },

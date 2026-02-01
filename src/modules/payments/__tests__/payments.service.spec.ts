@@ -158,7 +158,12 @@ describe('PaymentsService', () => {
         email: 'test@example.com',
         description: 'Test',
         source: { card_number: '****4242', card_brand: 'VISA' },
-        outcome: { type: 'venta_exitosa', code: 'AUT0000', merchant_message: '', user_message: '' },
+        outcome: {
+          type: 'venta_exitosa',
+          code: 'AUT0000',
+          merchant_message: '',
+          user_message: '',
+        },
         created_at: Date.now(),
       });
 
@@ -187,9 +192,9 @@ describe('PaymentsService', () => {
     it('should throw NotFoundException if order not found', async () => {
       orderRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.createPayment(createPaymentDto, mockUser)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.createPayment(createPaymentDto, mockUser),
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw BadRequestException if order already paid', async () => {
@@ -199,9 +204,9 @@ describe('PaymentsService', () => {
         status: PaymentStatus.COMPLETED,
       });
 
-      await expect(service.createPayment(createPaymentDto, mockUser)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        service.createPayment(createPaymentDto, mockUser),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw BadRequestException if order status is invalid', async () => {
@@ -210,9 +215,9 @@ describe('PaymentsService', () => {
         status: OrderStatus.CANCELLED,
       });
 
-      await expect(service.createPayment(createPaymentDto, mockUser)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        service.createPayment(createPaymentDto, mockUser),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should handle Culqi payment failure', async () => {
@@ -226,9 +231,9 @@ describe('PaymentsService', () => {
         new BadRequestException('Insufficient funds'),
       );
 
-      await expect(service.createPayment(createPaymentDto, mockUser)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        service.createPayment(createPaymentDto, mockUser),
+      ).rejects.toThrow(BadRequestException);
 
       expect(paymentRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -239,7 +244,10 @@ describe('PaymentsService', () => {
     });
 
     it('should create payment with MercadoPago', async () => {
-      const mpDto = { ...createPaymentDto, provider: PaymentProvider.MERCADOPAGO };
+      const mpDto = {
+        ...createPaymentDto,
+        provider: PaymentProvider.MERCADOPAGO,
+      };
 
       orderRepository.findOne.mockResolvedValue(mockOrder);
       paymentRepository.findOne.mockResolvedValue(null);
@@ -269,7 +277,10 @@ describe('PaymentsService', () => {
 
       paymentRepository.findOne
         .mockResolvedValueOnce(null)
-        .mockResolvedValueOnce({ ...mockPayment, status: PaymentStatus.COMPLETED });
+        .mockResolvedValueOnce({
+          ...mockPayment,
+          status: PaymentStatus.COMPLETED,
+        });
 
       await service.createPayment(mpDto, mockUser);
 
@@ -277,7 +288,10 @@ describe('PaymentsService', () => {
     });
 
     it('should create payment with Stripe', async () => {
-      const stripeDto = { ...createPaymentDto, provider: PaymentProvider.STRIPE };
+      const stripeDto = {
+        ...createPaymentDto,
+        provider: PaymentProvider.STRIPE,
+      };
 
       orderRepository.findOne.mockResolvedValue(mockOrder);
       paymentRepository.findOne.mockResolvedValue(null);
@@ -302,12 +316,19 @@ describe('PaymentsService', () => {
         metadata: {},
         created: Date.now(),
         charges: {
-          data: [{
-            id: 'ch_test',
-            payment_method_details: {
-              card: { brand: 'visa', last4: '4242', exp_month: 12, exp_year: 2030 },
+          data: [
+            {
+              id: 'ch_test',
+              payment_method_details: {
+                card: {
+                  brand: 'visa',
+                  last4: '4242',
+                  exp_month: 12,
+                  exp_year: 2030,
+                },
+              },
             },
-          }],
+          ],
         },
       });
       stripeService.isPaymentSucceeded.mockReturnValue(true);
@@ -315,7 +336,10 @@ describe('PaymentsService', () => {
 
       paymentRepository.findOne
         .mockResolvedValueOnce(null)
-        .mockResolvedValueOnce({ ...mockPayment, status: PaymentStatus.COMPLETED });
+        .mockResolvedValueOnce({
+          ...mockPayment,
+          status: PaymentStatus.COMPLETED,
+        });
 
       await service.createPayment(stripeDto, mockUser);
 
@@ -341,12 +365,18 @@ describe('PaymentsService', () => {
         created_at: Date.now(),
       });
 
-      const refundedPayment = { ...completedPayment, status: PaymentStatus.REFUNDED };
+      const refundedPayment = {
+        ...completedPayment,
+        status: PaymentStatus.REFUNDED,
+      };
       paymentRepository.findOne
         .mockResolvedValueOnce(completedPayment)
         .mockResolvedValueOnce(refundedPayment);
 
-      const result = await service.refundPayment(completedPayment.id, refundDto);
+      const result = await service.refundPayment(
+        completedPayment.id,
+        refundDto,
+      );
 
       expect(culqiService.createRefund).toHaveBeenCalledWith({
         charge_id: 'chr_test_123',
@@ -361,9 +391,9 @@ describe('PaymentsService', () => {
     it('should throw BadRequestException if payment not completed', async () => {
       paymentRepository.findOne.mockResolvedValue(mockPayment); // PENDING status
 
-      await expect(service.refundPayment(mockPayment.id, refundDto)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        service.refundPayment(mockPayment.id, refundDto),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw BadRequestException if no external reference', async () => {
@@ -372,9 +402,9 @@ describe('PaymentsService', () => {
         externalId: null,
       } as unknown as Payment);
 
-      await expect(service.refundPayment(mockPayment.id, refundDto)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        service.refundPayment(mockPayment.id, refundDto),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 
@@ -417,7 +447,9 @@ describe('PaymentsService', () => {
     it('should throw NotFoundException if payment not found', async () => {
       paymentRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.findOne('nonexistent')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('nonexistent')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

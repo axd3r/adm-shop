@@ -57,7 +57,9 @@ describe('FilesController', () => {
 
     it('should throw when image not found', () => {
       filesService.getStaticProductImgae.mockImplementation(() => {
-        throw new BadRequestException('No product found with image notfound.jpg');
+        throw new BadRequestException(
+          'No product found with image notfound.jpg',
+        );
       });
 
       expect(() =>

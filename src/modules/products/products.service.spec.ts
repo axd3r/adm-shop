@@ -220,7 +220,10 @@ describe('ProductsService', () => {
 
   describe('update', () => {
     const validUUID = '123e4567-e89b-12d3-a456-426614174000';
-    const productWithUUID = { ...mockProduct, id: validUUID } as unknown as Product;
+    const productWithUUID = {
+      ...mockProduct,
+      id: validUUID,
+    } as unknown as Product;
 
     it('should update a product', async () => {
       const updateDto = { title: 'Updated Title' };
@@ -276,7 +279,9 @@ describe('ProductsService', () => {
 
   describe('deleteAllProducts', () => {
     it('should delete all products', async () => {
-      (mockQueryBuilder.execute as jest.Mock).mockResolvedValue({ affected: 5 });
+      (mockQueryBuilder.execute as jest.Mock).mockResolvedValue({
+        affected: 5,
+      });
 
       await service.deleteAllProducts();
 

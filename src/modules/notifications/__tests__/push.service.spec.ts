@@ -224,7 +224,10 @@ describe('PushService', () => {
 
       service.broadcast(notification);
 
-      expect(mockServer.emit).toHaveBeenCalledWith('notification', notification);
+      expect(mockServer.emit).toHaveBeenCalledWith(
+        'notification',
+        notification,
+      );
     });
   });
 

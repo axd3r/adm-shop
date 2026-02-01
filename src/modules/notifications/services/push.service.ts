@@ -95,12 +95,15 @@ export class PushService {
   private disconnectPreviousSession(userId: string): void {
     for (const [socketId, client] of Object.entries(this.connectedClients)) {
       if (client.user.id === userId) {
-        client.socket.emit('notification', this.createNotification({
-          type: NotificationType.SYSTEM,
-          title: 'Sesión cerrada',
-          message: 'Se inició sesión en otro dispositivo',
-          priority: NotificationPriority.NORMAL,
-        }));
+        client.socket.emit(
+          'notification',
+          this.createNotification({
+            type: NotificationType.SYSTEM,
+            title: 'Sesión cerrada',
+            message: 'Se inició sesión en otro dispositivo',
+            priority: NotificationPriority.NORMAL,
+          }),
+        );
         client.socket.disconnect();
         delete this.connectedClients[socketId];
         break;
@@ -141,7 +144,9 @@ export class PushService {
     }
 
     this.server.to(`user:${userId}`).emit('notification', notification);
-    this.logger.log(`Notification sent to user ${userId}: ${notification.type}`);
+    this.logger.log(
+      `Notification sent to user ${userId}: ${notification.type}`,
+    );
     return true;
   }
 
@@ -181,20 +186,25 @@ export class PushService {
     this.sendToUser(userId, notification);
 
     // Also notify admins
-    this.sendToRole('admin', this.createNotification({
-      type: NotificationType.PAYMENT_SUCCESS,
-      title: 'Nuevo pago recibido',
-      message: `Orden ${data.orderNumber} - ${data.currency} ${data.amount.toFixed(2)}`,
-      priority: NotificationPriority.NORMAL,
-      data,
-    }));
+    this.sendToRole(
+      'admin',
+      this.createNotification({
+        type: NotificationType.PAYMENT_SUCCESS,
+        title: 'Nuevo pago recibido',
+        message: `Orden ${data.orderNumber} - ${data.currency} ${data.amount.toFixed(2)}`,
+        priority: NotificationPriority.NORMAL,
+        data,
+      }),
+    );
   }
 
   notifyPaymentFailed(userId: string, data: PaymentNotificationData): void {
     const notification = this.createNotification({
       type: NotificationType.PAYMENT_FAILED,
       title: 'Pago fallido',
-      message: data.errorMessage || 'No se pudo procesar tu pago. Por favor, intenta de nuevo.',
+      message:
+        data.errorMessage ||
+        'No se pudo procesar tu pago. Por favor, intenta de nuevo.',
       priority: NotificationPriority.HIGH,
       data,
     });
@@ -228,7 +238,12 @@ export class PushService {
 
   // ==================== ORDER NOTIFICATIONS ====================
 
-  notifyOrderCreated(userId: string, orderNumber: string, total: number, currency: string): void {
+  notifyOrderCreated(
+    userId: string,
+    orderNumber: string,
+    total: number,
+    currency: string,
+  ): void {
     const notification = this.createNotification({
       type: NotificationType.ORDER_CREATED,
       title: 'Orden creada',
@@ -240,7 +255,11 @@ export class PushService {
     this.sendToUser(userId, notification);
   }
 
-  notifyOrderShipped(userId: string, orderNumber: string, trackingNumber?: string): void {
+  notifyOrderShipped(
+    userId: string,
+    orderNumber: string,
+    trackingNumber?: string,
+  ): void {
     const notification = this.createNotification({
       type: NotificationType.ORDER_SHIPPED,
       title: 'Orden enviada',

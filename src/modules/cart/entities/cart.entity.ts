@@ -35,7 +35,7 @@ export class Cart {
   items: CartItem[];
 
   @ApiProperty({
-    example: 150.50,
+    example: 150.5,
     description: 'Cart subtotal',
   })
   @Column('decimal', { precision: 10, scale: 2, default: 0 })

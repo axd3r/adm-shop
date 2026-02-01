@@ -155,7 +155,10 @@ describe('CartService', () => {
     });
 
     it('should throw BadRequestException if insufficient stock', async () => {
-      productRepository.findOne.mockResolvedValue({ ...mockProduct, stock: 1 } as any);
+      productRepository.findOne.mockResolvedValue({
+        ...mockProduct,
+        stock: 1,
+      } as any);
 
       await expect(service.addItem('user-123', addToCartDto)).rejects.toThrow(
         BadRequestException,

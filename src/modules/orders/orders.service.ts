@@ -107,7 +107,9 @@ export class OrdersService {
       return this.findOne(savedOrder.id, user.id);
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      this.logger.error(`Error creating order: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      this.logger.error(
+        `Error creating order: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
       throw error;
     } finally {
       await queryRunner.release();

@@ -85,7 +85,9 @@ export class EmailService {
     }
   }
 
-  async sendPaymentSuccessEmail(context: PaymentEmailContext): Promise<boolean> {
+  async sendPaymentSuccessEmail(
+    context: PaymentEmailContext,
+  ): Promise<boolean> {
     return this.sendEmail({
       to: context.customerEmail,
       subject: `Pago confirmado - Orden ${context.orderNumber}`,
@@ -113,7 +115,9 @@ export class EmailService {
     });
   }
 
-  async sendPaymentRefundedEmail(context: PaymentEmailContext): Promise<boolean> {
+  async sendPaymentRefundedEmail(
+    context: PaymentEmailContext,
+  ): Promise<boolean> {
     return this.sendEmail({
       to: context.customerEmail,
       subject: `Reembolso procesado - Orden ${context.orderNumber}`,
@@ -132,13 +136,17 @@ export class EmailService {
   ): string {
     switch (template) {
       case EmailTemplate.PAYMENT_SUCCESS:
-        return this.renderPaymentSuccessTemplate(context as unknown as PaymentEmailContext);
+        return this.renderPaymentSuccessTemplate(
+          context as unknown as PaymentEmailContext,
+        );
       case EmailTemplate.PAYMENT_FAILED:
         return this.renderPaymentFailedTemplate(
           context as unknown as PaymentEmailContext & { errorMessage: string },
         );
       case EmailTemplate.PAYMENT_REFUNDED:
-        return this.renderPaymentRefundedTemplate(context as unknown as PaymentEmailContext);
+        return this.renderPaymentRefundedTemplate(
+          context as unknown as PaymentEmailContext,
+        );
       default:
         return '';
     }

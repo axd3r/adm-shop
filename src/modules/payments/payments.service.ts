@@ -86,7 +86,11 @@ export class PaymentsService {
           await this.processCulqiPayment(payment, order, createPaymentDto);
           break;
         case PaymentProvider.MERCADOPAGO:
-          await this.processMercadoPagoPayment(payment, order, createPaymentDto);
+          await this.processMercadoPagoPayment(
+            payment,
+            order,
+            createPaymentDto,
+          );
           break;
         case PaymentProvider.STRIPE:
           await this.processStripePayment(payment, order, createPaymentDto);

@@ -168,9 +168,14 @@ describe('WebhooksService', () => {
         type: 'charge.creation.failed',
       };
 
-      const processingPayment = { ...mockPayment, status: PaymentStatus.PROCESSING };
+      const processingPayment = {
+        ...mockPayment,
+        status: PaymentStatus.PROCESSING,
+      };
       paymentRepository.findOne.mockResolvedValue(processingPayment);
-      paymentRepository.save.mockImplementation(async (payment) => payment as Payment);
+      paymentRepository.save.mockImplementation(
+        async (payment) => payment as Payment,
+      );
 
       const result = await service.handleCulqiWebhook(
         failedEvent,
@@ -235,7 +240,9 @@ describe('WebhooksService', () => {
         status: PaymentStatus.PROCESSING,
       };
       paymentRepository.findOne.mockResolvedValue(mpPayment);
-      paymentRepository.save.mockImplementation(async (payment) => payment as Payment);
+      paymentRepository.save.mockImplementation(
+        async (payment) => payment as Payment,
+      );
 
       mercadoPagoService.getPayment.mockResolvedValue({
         id: 98765,
@@ -268,7 +275,9 @@ describe('WebhooksService', () => {
         status: PaymentStatus.PROCESSING,
       };
       paymentRepository.findOne.mockResolvedValue(mpPayment);
-      paymentRepository.save.mockImplementation(async (payment) => payment as Payment);
+      paymentRepository.save.mockImplementation(
+        async (payment) => payment as Payment,
+      );
 
       mercadoPagoService.getPayment.mockResolvedValue({
         id: 98765,
@@ -392,7 +401,9 @@ describe('WebhooksService', () => {
         status: PaymentStatus.PROCESSING,
       };
       paymentRepository.findOne.mockResolvedValue(processingPayment);
-      paymentRepository.save.mockImplementation(async (payment) => payment as Payment);
+      paymentRepository.save.mockImplementation(
+        async (payment) => payment as Payment,
+      );
 
       await service.handleCulqiWebhook(
         culqiEvent,
@@ -409,7 +420,9 @@ describe('WebhooksService', () => {
         status: PaymentStatus.PROCESSING,
       };
       paymentRepository.findOne.mockResolvedValue(processingPayment);
-      paymentRepository.save.mockImplementation(async (payment) => payment as Payment);
+      paymentRepository.save.mockImplementation(
+        async (payment) => payment as Payment,
+      );
 
       await service.handleCulqiWebhook(
         culqiEvent,

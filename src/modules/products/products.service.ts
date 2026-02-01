@@ -150,9 +150,7 @@ export class ProductsService {
       throw new NotFoundException(`Producto con id ${id} no enocntrado`);
     }
     await this.productRepository.remove(product);
-    this.logger.log(
-      `Product ${id} deleted by user ${user?.id || 'unknown'}`,
-    );
+    this.logger.log(`Product ${id} deleted by user ${user?.id || 'unknown'}`);
     return {
       status: 'Success',
       message: 'Registro eliminado con exito',

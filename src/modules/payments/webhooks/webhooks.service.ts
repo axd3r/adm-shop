@@ -254,7 +254,10 @@ export class WebhooksService {
       .update(manifest)
       .digest('hex');
 
-    return crypto.timingSafeEqual(Buffer.from(v1), Buffer.from(expectedSignature));
+    return crypto.timingSafeEqual(
+      Buffer.from(v1),
+      Buffer.from(expectedSignature),
+    );
   }
 
   // ==================== STRIPE WEBHOOK ====================
@@ -315,10 +318,7 @@ export class WebhooksService {
           break;
 
         case 'payment_intent.payment_failed':
-          await this.markPaymentFailed(
-            payment,
-            'Payment failed',
-          );
+          await this.markPaymentFailed(payment, 'Payment failed');
           break;
 
         case 'charge.refunded':

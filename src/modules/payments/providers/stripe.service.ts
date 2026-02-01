@@ -205,9 +205,7 @@ export class StripeService {
 
       if (!response.ok) {
         this.logger.error(`Stripe refund failed: ${JSON.stringify(result)}`);
-        throw new BadRequestException(
-          result.error?.message || 'Refund failed',
-        );
+        throw new BadRequestException(result.error?.message || 'Refund failed');
       }
 
       this.logger.log(`Stripe refund created: ${result.id}`);

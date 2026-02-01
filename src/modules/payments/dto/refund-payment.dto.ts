@@ -12,8 +12,9 @@ export class RefundPaymentDto {
   reason?: string;
 
   @ApiProperty({
-    example: 50.00,
-    description: 'Amount to refund (partial refund). If not provided, full refund.',
+    example: 50.0,
+    description:
+      'Amount to refund (partial refund). If not provided, full refund.',
     required: false,
   })
   @IsNumber()

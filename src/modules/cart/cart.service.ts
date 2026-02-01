@@ -88,7 +88,9 @@ export class CartService {
 
     await this.updateCartTotals(cart.id);
 
-    this.logger.log(`Added ${quantity}x product ${productId} to cart ${cart.id}`);
+    this.logger.log(
+      `Added ${quantity}x product ${productId} to cart ${cart.id}`,
+    );
 
     return this.getCart(userId);
   }

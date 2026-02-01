@@ -121,7 +121,11 @@ describe('ProductsController', () => {
       const updatedProduct = { ...mockProduct, ...updateDto };
       productsService.update.mockResolvedValue(updatedProduct as any);
 
-      const result = await controller.update(mockProduct.id, updateDto, mockUser);
+      const result = await controller.update(
+        mockProduct.id,
+        updateDto,
+        mockUser,
+      );
 
       expect(productsService.update).toHaveBeenCalledWith(
         mockProduct.id,
@@ -134,12 +138,18 @@ describe('ProductsController', () => {
 
   describe('remove', () => {
     it('should remove a product', async () => {
-      const deleteResponse = { status: 'Success', message: 'Registro eliminado con exito' };
+      const deleteResponse = {
+        status: 'Success',
+        message: 'Registro eliminado con exito',
+      };
       productsService.remove.mockResolvedValue(deleteResponse);
 
       const result = await controller.remove(mockProduct.id, mockUser);
 
-      expect(productsService.remove).toHaveBeenCalledWith(mockProduct.id, mockUser);
+      expect(productsService.remove).toHaveBeenCalledWith(
+        mockProduct.id,
+        mockUser,
+      );
       expect(result).toEqual(deleteResponse);
     });
   });
@@ -152,7 +162,10 @@ describe('ProductsController', () => {
 
       const result = await controller.findMySeller(paginationDto, mockUser);
 
-      expect(productsService.findBySeller).toHaveBeenCalledWith(paginationDto, mockUser);
+      expect(productsService.findBySeller).toHaveBeenCalledWith(
+        paginationDto,
+        mockUser,
+      );
       expect(result).toEqual(products);
     });
   });

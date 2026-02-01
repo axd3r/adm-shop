@@ -46,14 +46,14 @@ export class CartItem {
   size: string;
 
   @ApiProperty({
-    example: 75.00,
+    example: 75.0,
     description: 'Price at time of adding to cart',
   })
   @Column('decimal', { precision: 10, scale: 2 })
   price: number;
 
   @ApiProperty({
-    example: 150.00,
+    example: 150.0,
     description: 'Subtotal (price * quantity)',
   })
   @Column('decimal', { precision: 10, scale: 2 })

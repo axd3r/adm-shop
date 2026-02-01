@@ -94,7 +94,11 @@ describe('CartController', () => {
     it('should update cart item', async () => {
       service.updateItem.mockResolvedValue(mockCart);
 
-      const result = await controller.updateItem('item-123', updateDto, mockUser);
+      const result = await controller.updateItem(
+        'item-123',
+        updateDto,
+        mockUser,
+      );
 
       expect(result).toEqual(mockCart);
       expect(service.updateItem).toHaveBeenCalledWith(

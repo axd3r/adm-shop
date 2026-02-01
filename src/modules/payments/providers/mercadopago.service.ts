@@ -82,7 +82,9 @@ export class MercadoPagoService {
       const result = await response.json();
 
       if (!response.ok) {
-        this.logger.error(`MercadoPago payment failed: ${JSON.stringify(result)}`);
+        this.logger.error(
+          `MercadoPago payment failed: ${JSON.stringify(result)}`,
+        );
         throw new BadRequestException(
           result.message || this.getErrorMessage(result.cause),
         );
@@ -128,7 +130,9 @@ export class MercadoPagoService {
       const result = await response.json();
 
       if (!response.ok) {
-        this.logger.error(`MercadoPago refund failed: ${JSON.stringify(result)}`);
+        this.logger.error(
+          `MercadoPago refund failed: ${JSON.stringify(result)}`,
+        );
         throw new BadRequestException(result.message || 'Refund failed');
       }
 
@@ -180,7 +184,9 @@ export class MercadoPagoService {
     return `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
   }
 
-  private getErrorMessage(cause?: Array<{ code: string; description: string }>): string {
+  private getErrorMessage(
+    cause?: Array<{ code: string; description: string }>,
+  ): string {
     if (!cause || cause.length === 0) {
       return 'Payment failed';
     }
